@@ -3,8 +3,8 @@ require 'rails_helper'
 RSpec.describe "Categories", type: :request do
   describe "GET /categories" do
     it 'returns all categories' do
-      FactoryBot.create(:category, name: 'testing', description: 'this is a description')
-      FactoryBot.create(:category, name: 'testing2', description: 'this is another description')
+      FactoryBot.create(:category, name: 'name', description: 'this is a description')
+      FactoryBot.create(:category, name: 'name again', description: 'this is another description')
       get '/api/v1/categories'
 
       expect(response).to have_http_status(:success)
@@ -12,7 +12,7 @@ RSpec.describe "Categories", type: :request do
     end
 
     it 'returns a category' do
-      cat = FactoryBot.create(:category, name: 'testing', description: 'this is a description')
+      cat = FactoryBot.create(:category, name: 'name', description: 'this is a description')
 
       get "/api/v1/categories/#{cat.id}"
 
@@ -31,8 +31,20 @@ RSpec.describe "Categories", type: :request do
     end
   end
 
+  describe "PATCH /categories/:id" do
+    it 'should update data in category' do
+      cat = FactoryBot.create(:category, name: 'name', description: 'this is a description')
+      patch "/api/v1/categories/#{cat.id}", params: {category: {name: 'new name', description: 'new description'}}
+
+      expect(response).to have_http_status(200)
+      json_body = JSON.parse(response.body)
+      expect(json_body['name']).to eq('new name')
+      expect(json_body['description']).to eq('new description')      
+    end
+  end
+
   describe 'DELETE /categories/:id' do
-    let!(:cat) { FactoryBot.create(:category, name: 'testing', description: 'this is a description') }
+    let!(:cat) { FactoryBot.create(:category, name: 'name', description: 'this is a description') }
     it 'deletes a category' do
       expect {
         delete "/api/v1/categories/#{cat.id}"
