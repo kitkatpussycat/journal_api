@@ -2,7 +2,8 @@ require 'rails_helper'
 
 RSpec.describe Task, type: :model do
   it 'should have a name' do
-    c = FactoryBot.create(:category, name: 'name', description: '')
+    user = User.create(email: "email@email.com", password: 'password')
+    c = FactoryBot.create(:category, name: 'name', description: '', user:user)
     t = Task.new(
       name: '',
       description: '',
@@ -15,7 +16,8 @@ RSpec.describe Task, type: :model do
   end
 
   it "should have a date" do
-    c = FactoryBot.create(:category, name: 'name', description: '')
+    user = User.create(email: "email@email.com", password: 'password')
+    c = FactoryBot.create(:category, name: 'name', description: '', user:user)
     t = Task.new(
       name: 'name',
       description: '',
@@ -29,7 +31,8 @@ RSpec.describe Task, type: :model do
   end
 
   it "date should not be in the past" do
-    c = FactoryBot.create(:category, name: 'name', description: '')
+    user = User.create(email: "email@email.com", password: 'password')
+    c = FactoryBot.create(:category, name: 'name', description: '', user:user)
     t = Task.new(
       name: 'name',
       description: '',
@@ -40,7 +43,7 @@ RSpec.describe Task, type: :model do
     expect(t).to_not be_valid
     t.date = Date.today
     expect(t).to be_valid
-    t.date = Date.new(2022, 12, 12)
+    t.date = Date.new(3000, 12, 12)
     expect(t).to be_valid
   end
 end

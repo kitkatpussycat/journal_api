@@ -2,9 +2,17 @@ module Api
     module V1
 
         class TasksController < ApplicationController
+            before_action :authenticate_user!
+
             def show
-                task = Task.find(params[:id])
-                render json: task, status: 200
+                query = Task.find(params[:id])
+                task = Task.joins("INNER JOIN categories c ON tasks.category_id=c.id INNER JOIN users ON users.id=c.user_id WHERE tasks.id=#{query.id} AND users.id=#{current_user.id}")
+                if task.length == 1
+                    task = task.first()
+                    render json: task, status: 200
+                else
+                    render json: {message: "Task not foud"}, status: 400
+                end
             end
 
             def create
@@ -17,20 +25,31 @@ module Api
             end
 
             def update
-                task = Task.find(params[:id])
-
-                if task.update(task_params)
-                    render json: task, status: 200
+                query = Task.find(params[:id])
+                task = Task.joins("INNER JOIN categories c ON tasks.category_id=c.id INNER JOIN users ON users.id=c.user_id WHERE tasks.id=#{query.id} AND users.id=#{current_user.id}")
+                if task.length == 1
+                    task = task.first()
+                    if task.update(task_params)
+                        render json: task, status: 200
+                    else
+                        render json: task.errors, status: :unprocessable_entity
+                    end
                 else
-                    render json: task.errors, status: :unprocessable_entity
+                    render json: {message: "Task not found."}, status: :not_found
                 end
             end
-
+        
             def destroy
-                Task.find(params[:id]).destroy!
-                head :no_content
+                query = Task.find(params[:id])
+                task = Task.joins("INNER JOIN categories c ON tasks.category_id=c.id INNER JOIN users ON users.id=c.user_id WHERE tasks.id=#{query.id} AND users.id=#{current_user.id}")
+                if task.length == 1
+                    t = task.first().destroy!
+                    head :no_content
+                else
+                    render json: {message: "Task not found."}, status: :not_found
+                end
             end
-
+               
             private
             def task_params
                 params.require(:task).permit(:name, :description, :date, :completed, :category_id)

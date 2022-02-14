@@ -1,11 +1,9 @@
-module Api
+module Api 
     module V1
-
         class SessionsController < Devise::SessionsController
             respond_to :json
 
             private
-
             def respond_with(resource, _opts = {})
                 if current_user
                     render json: {
