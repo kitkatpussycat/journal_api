@@ -6,7 +6,7 @@ class User < ApplicationRecord
          jwt_revocation_strategy: JwtDenylist
 
          validates :email,presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
-         validates :password, presence: true
+         validates :password, presence: true, length: {minimum:6}
 
          has_many :categories, dependent: :destroy
 end
